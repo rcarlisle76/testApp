@@ -83,17 +83,30 @@ if (contactForm) {
             return;
         }
 
-        // Simulate form submission (in a real application, this would send to a server)
+        // Send to server
         showFormMessage('Sending...', 'info');
 
-        // Simulate API call
-        setTimeout(() => {
-            showFormMessage('Thank you for your message! We\'ll get back to you within 24 hours.', 'success');
-            contactForm.reset();
-
-            // Log to console for demo purposes
-            console.log('Form submitted with data:', formData);
-        }, 1500);
+        // Submit to API
+        fetch('/api/contacts', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showFormMessage('Thank you for your message! We\'ll get back to you within 24 hours.', 'success');
+                contactForm.reset();
+            } else {
+                showFormMessage(data.message || 'Error submitting form. Please try again.', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showFormMessage('Error submitting form. Please check your connection and try again.', 'error');
+        });
     });
 }
 
